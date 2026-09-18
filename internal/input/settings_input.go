@@ -11,7 +11,7 @@ func handleSettingsInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
 	if o.SettingsEditActive() {
 		return handleSettingsEditInput(msg, o)
 	}
-	switch msg.String() {
+	switch hotkeyString(msg) {
 	case "esc", "q", "ctrl+c":
 		o.CloseSettings()
 	case "up", "k":

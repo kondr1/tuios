@@ -34,7 +34,7 @@ func handleLauncherInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
 
 	case "backspace":
 		if len(o.LauncherQuery) > 0 {
-			o.LauncherQuery = o.LauncherQuery[:len(o.LauncherQuery)-1]
+			o.LauncherQuery = dropLastRune(o.LauncherQuery)
 			o.LauncherRefilter()
 		}
 		return o, o.LauncherIconWork()

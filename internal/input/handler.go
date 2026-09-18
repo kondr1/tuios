@@ -178,6 +178,10 @@ func detachSession(o *app.OS) (*app.OS, tea.Cmd, bool) {
 
 // HandleKeyPress handles all keyboard input and routes to mode-specific handlers
 func HandleKeyPress(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
+	// Before anything reads the key: on a non-Latin layout the decoder can hand
+	// over a shifted key whose text is the Latin letter underneath it.
+	msg = repairAlternateKeys(msg)
+
 	// Capture the keypress for the showkeys overlay when it is enabled. This is
 	// the earliest shared point in the input path, before any mode routing or
 	// handler can consume the key, so the overlay reflects keys in both
@@ -407,9 +411,16 @@ func handleRenameMode(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
 	}
 }
 
-// isLeaderKey reports whether a key press is the configured leader.
+// isLeaderKey reports whether a key press is the configured leader, under any
+// of the spellings a binding answers to, so a leader such as alt+a still works
+// on a non-Latin layout.
 func isLeaderKey(msg tea.KeyPressMsg, s *config.Settings) bool {
-	return strings.EqualFold(msg.String(), s.LeaderKey)
+	for _, key := range bindingKeys(msg) {
+		if strings.EqualFold(key, s.LeaderKey) {
+			return true
+		}
+	}
+	return false
 }
 
 // handlePrefixKey handles Ctrl+B prefix key activation
@@ -428,7 +439,7 @@ func handlePrefixKey(_ tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
 // handleLogViewerKey handles keyboard input when the log viewer overlay is active.
 // This is shared between terminal mode and window management mode.
 func handleLogViewerKey(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
-	key := msg.String()
+	key := hotkeyString(msg)
 
 	// Close log viewer with q or esc
 	if key == "q" || key == "esc" {

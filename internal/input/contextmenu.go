@@ -45,7 +45,7 @@ func runContextMenuAction(action string, o *app.OS) (*app.OS, tea.Cmd) {
 // keystroke meant for it can never fall through to a window-manager binding or
 // to the shell.
 func handleContextMenuKey(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
-	switch msg.String() {
+	switch hotkeyString(msg) {
 	case "esc", "ctrl+c":
 		o.CloseContextMenu()
 	case "up", "k", "shift+tab":

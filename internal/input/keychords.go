@@ -1,6 +1,7 @@
 package input
 
 import (
+	"slices"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
@@ -25,6 +26,9 @@ const lockMods = tea.ModCapsLock | tea.ModNumLock | tea.ModScrollLock
 //   - macOptionChord covers macOS Option chords that arrive as the character the
 //     OS composed, with the Alt bit set or (without the Kitty protocol) missing
 //     entirely.
+//   - usLayoutKey covers a non-Latin layout, where the key the user pressed
+//     arrives as the Cyrillic letter on it. It is tried last, so a binding
+//     written on that letter itself still wins.
 func bindingKeys(msg tea.KeyPressMsg) []string {
 	key := msg.String()
 	keys := []string{key}
@@ -45,6 +49,13 @@ func bindingKeys(msg tea.KeyPressMsg) []string {
 			}
 		}
 		keys = append(keys, chord)
+	}
+	if us, ok := usLayoutKey(msg); ok {
+		for _, spelling := range []string{us.String(), us.Keystroke()} {
+			if !slices.Contains(keys, spelling) {
+				keys = append(keys, spelling)
+			}
+		}
 	}
 	return keys
 }

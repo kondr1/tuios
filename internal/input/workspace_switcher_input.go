@@ -38,7 +38,7 @@ func handleWorkspaceSwitcherInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.
 
 	case "backspace":
 		if len(o.WorkspaceSwitcherQuery) > 0 {
-			o.WorkspaceSwitcherQuery = o.WorkspaceSwitcherQuery[:len(o.WorkspaceSwitcherQuery)-1]
+			o.WorkspaceSwitcherQuery = dropLastRune(o.WorkspaceSwitcherQuery)
 			o.WorkspaceSwitcherSelected = 0
 			o.WorkspaceSwitcherScroll = 0
 		}

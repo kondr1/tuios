@@ -16,7 +16,7 @@ import (
 // Which axis a motion key moves is the picker's business, not this handler's:
 // it takes the step and hands it over.
 func handleAccentPickerInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
-	switch msg.String() {
+	switch hotkeyString(msg) {
 	case "esc":
 		o.CloseAccentPicker()
 		return o, nil

@@ -9,7 +9,7 @@ import (
 // The arrows select, shifted arrows move the selected component (and carry it
 // into the next region off the end of its own), Enter adds or removes.
 func handleDockEditorInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
-	switch keyStr := msg.String(); keyStr {
+	switch keyStr := hotkeyString(msg); keyStr {
 	case "esc":
 		// Closes, keeping the layout. Every edit here was applied and saved as
 		// it was made, so there is nothing pending for Esc to abandon.

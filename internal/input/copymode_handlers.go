@@ -78,6 +78,10 @@ func handleNormalInput(msg tea.KeyPressMsg, cm *terminal.CopyMode, window *termi
 		return
 	}
 
+	// Past the character search, a key is a command, and the motions are named
+	// by the Latin key whatever layout typed them.
+	keyStr = hotkeyString(msg)
+
 	// Handle digit keys for count prefix (1-9, 0 only if already has count)
 	if len(keyStr) == 1 && keyStr[0] >= '0' && keyStr[0] <= '9' {
 		digit := int(keyStr[0] - '0')
@@ -374,7 +378,7 @@ func handleSearchInput(msg tea.KeyPressMsg, cm *terminal.CopyMode, window *termi
 		fx.ShowNotification("", "info", 0)
 	case tea.KeyBackspace:
 		if len(cm.SearchQuery) > 0 {
-			cm.SearchQuery = cm.SearchQuery[:len(cm.SearchQuery)-1]
+			cm.SearchQuery = dropLastRune(cm.SearchQuery)
 			executeSearch(cm, window)
 		}
 		fx.ShowNotification(searchPrefix+cm.SearchQuery, "info", 0)
@@ -418,6 +422,8 @@ func handleVisualInput(msg tea.KeyPressMsg, cm *terminal.CopyMode, window *termi
 		}
 		return
 	}
+
+	keyStr = hotkeyString(msg)
 
 	// Handle digit keys for count prefix in visual mode
 	if len(keyStr) == 1 && keyStr[0] >= '0' && keyStr[0] <= '9' {

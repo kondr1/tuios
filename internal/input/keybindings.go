@@ -9,6 +9,7 @@ package input
 
 import (
 	"runtime"
+	"unicode"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/Gaurav-Gosain/tuios/internal/vt"
@@ -120,6 +121,19 @@ func getRawKeyBytesWithMode(msg tea.KeyPressMsg, applicationCursorKeys bool) []b
 			if ctrlCode, ok := ctrlKeyMap[key.Code]; ok {
 				return []byte{ctrlCode}
 			}
+
+			// A control code only exists for the Latin keys, and on a
+			// non-Latin layout Ctrl+C arrives as Ctrl+С. A terminal writing to
+			// a tty sends the control code of the key in the US position, so
+			// the shell gets its interrupt whichever layout is active.
+			if us, ok := usLayoutKey(msg); ok {
+				if us.Code >= 'a' && us.Code <= 'z' {
+					return []byte{byte(us.Code - 'a' + 1)}
+				}
+				if ctrlCode, ok := ctrlKeyMap[us.Code]; ok {
+					return []byte{ctrlCode}
+				}
+			}
 		}
 
 		// Handle Alt+letter combinations (ESC prefix)
@@ -128,12 +142,22 @@ func getRawKeyBytesWithMode(msg tea.KeyPressMsg, applicationCursorKeys bool) []b
 			case tea.KeyBackspace:
 				return []byte{0x1b, 0x7f}
 			default:
-				// Alt+character sends ESC followed by character
-				if key.Text != "" && len(key.Text) == 1 {
-					return []byte{0x1b, key.Text[0]}
+				// Alt+character sends ESC followed by the character, in UTF-8
+				// when it is not ASCII. The text is empty under the Kitty
+				// protocol, so the character comes from the code, shifted if
+				// Shift is held: alt+shift+a is ESC A, not ESC a.
+				if key.Text != "" {
+					return append([]byte{0x1b}, key.Text...)
 				}
-				if key.Code >= 32 && key.Code <= 126 {
-					return []byte{0x1b, byte(key.Code)}
+				char := key.Code
+				if actualMod&tea.ModShift != 0 {
+					char = unicode.ToUpper(key.Code)
+					if key.ShiftedCode != 0 {
+						char = key.ShiftedCode
+					}
+				}
+				if char >= 32 && char != 127 && unicode.IsPrint(char) {
+					return append([]byte{0x1b}, string(char)...)
 				}
 			}
 		}
@@ -322,7 +346,7 @@ func buildCSISequence(num, modParam int) []byte {
 // vtKeyFromBubbletea converts a bubbletea KeyPressMsg to a VT emulator
 // KeyPressEvent for use with the kitty keyboard protocol's SendKey path.
 func vtKeyFromBubbletea(msg tea.KeyPressMsg) vt.KeyPressEvent {
-	key := msg.Key()
+	key := repairAlternateKeys(msg).Key()
 	return vt.KeyPressEvent{
 		Code:        key.Code,
 		Text:        key.Text,

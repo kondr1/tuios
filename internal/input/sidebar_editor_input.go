@@ -12,7 +12,7 @@ import (
 // Enter puts a section on the rail or takes it off. The left and right arrows
 // are the one addition, and they walk the share.
 func handleSectionEditorInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
-	switch keyStr := msg.String(); keyStr {
+	switch keyStr := hotkeyString(msg); keyStr {
 	case "esc":
 		// Closes, keeping the layout. Every edit here was applied and saved as
 		// it was made, so there is nothing pending for Esc to abandon.

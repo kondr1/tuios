@@ -94,7 +94,7 @@ func HandleTerminalModeKey(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
 			// Handle backspace
 			if key == "backspace" {
 				if len(o.HelpSearchQuery) > 0 {
-					o.HelpSearchQuery = o.HelpSearchQuery[:len(o.HelpSearchQuery)-1]
+					o.HelpSearchQuery = dropLastRune(o.HelpSearchQuery)
 					o.HelpScrollOffset = 0 // Reset scroll when query changes
 				}
 				return o, nil
@@ -181,7 +181,7 @@ func HandleTerminalModeKey(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
 
 	// Handle cache stats viewer (takes priority in terminal mode)
 	if o.ShowCacheStats {
-		key := msg.String()
+		key := hotkeyString(msg)
 
 		// Close cache stats with q, esc, or c
 		if key == "q" || key == "esc" || key == "c" {

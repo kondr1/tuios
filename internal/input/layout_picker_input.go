@@ -40,7 +40,7 @@ func handleLayoutSaveInput(keyStr string, o *app.OS) (*app.OS, tea.Cmd) {
 
 	case "backspace":
 		if len(o.LayoutSaveBuffer) > 0 {
-			o.LayoutSaveBuffer = o.LayoutSaveBuffer[:len(o.LayoutSaveBuffer)-1]
+			o.LayoutSaveBuffer = dropLastRune(o.LayoutSaveBuffer)
 		}
 		return o, nil
 
@@ -101,7 +101,7 @@ func handleLayoutLoadInput(keyStr string, o *app.OS) (*app.OS, tea.Cmd) {
 
 	case "backspace":
 		if len(o.LayoutPickerQuery) > 0 {
-			o.LayoutPickerQuery = o.LayoutPickerQuery[:len(o.LayoutPickerQuery)-1]
+			o.LayoutPickerQuery = dropLastRune(o.LayoutPickerQuery)
 			o.LayoutPickerSelected = 0
 			o.LayoutPickerScroll = 0
 		}

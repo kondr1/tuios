@@ -85,7 +85,7 @@ func handleKeybindManagerInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd
 	}
 
 	// The tabs without a filter can spend letters on movement.
-	switch msg.String() {
+	switch hotkeyString(msg) {
 	case "q":
 		o.CloseKeybindManager()
 	case "k":
@@ -112,7 +112,7 @@ func handleKeybindFilterInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd)
 		o.KeybindStepTab(1)
 	case "backspace":
 		if q := o.KeybindQuery(); q != "" {
-			o.KeybindSetQuery(q[:len(q)-1])
+			o.KeybindSetQuery(dropLastRune(q))
 		}
 	case "ctrl+u":
 		o.KeybindSetQuery("")

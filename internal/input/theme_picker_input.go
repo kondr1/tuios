@@ -19,7 +19,7 @@ func handleThemePickerInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
 		o.ThemePickerMove(1)
 	case "backspace":
 		if len(o.ThemePickerQuery) > 0 {
-			o.ThemePickerQuery = o.ThemePickerQuery[:len(o.ThemePickerQuery)-1]
+			o.ThemePickerQuery = dropLastRune(o.ThemePickerQuery)
 			o.ThemePickerRefilter()
 		}
 	case "ctrl+u":

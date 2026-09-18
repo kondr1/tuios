@@ -175,7 +175,7 @@ func HandleWindowManagementModeKey(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea
 			// Handle backspace
 			if key == "backspace" {
 				if len(o.HelpSearchQuery) > 0 {
-					o.HelpSearchQuery = o.HelpSearchQuery[:len(o.HelpSearchQuery)-1]
+					o.HelpSearchQuery = dropLastRune(o.HelpSearchQuery)
 					o.HelpScrollOffset = 0 // Reset scroll when query changes
 				}
 				return o, nil

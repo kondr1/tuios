@@ -40,7 +40,7 @@ func handleAggregateViewInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd)
 
 	case "backspace":
 		if len(o.AggregateViewQuery) > 0 {
-			o.AggregateViewQuery = o.AggregateViewQuery[:len(o.AggregateViewQuery)-1]
+			o.AggregateViewQuery = dropLastRune(o.AggregateViewQuery)
 			o.AggregateViewSelected = 0
 			o.AggregateViewScroll = 0
 		}

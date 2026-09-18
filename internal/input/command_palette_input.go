@@ -27,7 +27,7 @@ func handleCommandPaletteInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd
 
 	case "backspace":
 		if len(o.CommandPaletteQuery) > 0 {
-			o.CommandPaletteQuery = o.CommandPaletteQuery[:len(o.CommandPaletteQuery)-1]
+			o.CommandPaletteQuery = dropLastRune(o.CommandPaletteQuery)
 			o.CommandPaletteSelected = 0
 			o.CommandPaletteScroll = 0
 		}

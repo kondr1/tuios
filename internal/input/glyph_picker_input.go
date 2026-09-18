@@ -19,7 +19,7 @@ func handleGlyphPickerInput(msg tea.KeyPressMsg, o *app.OS) (*app.OS, tea.Cmd) {
 		o.GlyphPickerMove(1)
 	case "backspace":
 		if len(o.GlyphPickerQuery) > 0 {
-			o.GlyphPickerQuery = o.GlyphPickerQuery[:len(o.GlyphPickerQuery)-1]
+			o.GlyphPickerQuery = dropLastRune(o.GlyphPickerQuery)
 			o.GlyphPickerRefilter()
 		}
 	case "ctrl+u":
