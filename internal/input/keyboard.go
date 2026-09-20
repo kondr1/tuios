@@ -19,14 +19,18 @@ import (
 // registered as such. Reaching it from here meant a user who unbound corner
 // snap got corner snap anyway, from the action they had bound instead.
 func selectWindowByIndex(num int, o *app.OS) {
-	// With tiling on, the index counts what is on screen, so the numbers match
-	// what the user can see rather than a list that includes hidden panes.
+	// The index counts what is on screen, so the numbers match what the user can
+	// see rather than a list that includes hidden panes. A minimized pane is off
+	// screen whether or not tiling is on: skipping it only under tiling let the
+	// number focus a pane that is in the dock, and the next key typed into it
+	// went somewhere invisible. Restoring one by number is what the minimize
+	// prefix is for.
 	count := 0
 	for i, win := range o.Windows {
 		if win.Workspace != o.CurrentWorkspace {
 			continue
 		}
-		if o.AutoTiling && win.Minimized {
+		if win.Minimized {
 			continue
 		}
 		count++

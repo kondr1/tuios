@@ -10,6 +10,15 @@ import (
 // EnterTerminalMode switches from window management to terminal mode.
 // In terminal mode, raw input bypasses Bubbletea and goes directly to the PTY.
 func (m *OS) EnterTerminalMode() tea.Cmd {
+	// Typing into a pane that is not on screen is never what the key meant, and
+	// a minimized pane can hold the focus: the rail and the window numbers
+	// address a pane by name, not by what is visible. So the pane comes back
+	// first. RestoreWindow leaves window mode behind it, which is why it runs
+	// before the mode is set rather than after.
+	if w := m.GetFocusedWindow(); w != nil && w.Minimized {
+		m.RestoreWindow(m.FocusedWindow)
+	}
+
 	// Record mode switch for tape recording
 	if m.TapeRecorder != nil && m.TapeRecorder.IsRecording() {
 		m.TapeRecorder.RecordModeSwitch(tape.CommandTypeTerminalMode)
